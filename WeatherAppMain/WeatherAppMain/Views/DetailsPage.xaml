@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="clr-namespace:WeatherAppMain.Views.Controls"
+             mc:Ignorable="d"
+             x:Class="WeatherAppMain.DetailsPage"
+              Style="{StaticResource DetailPageStyle}">
+    <ScrollView>
+        <Grid>
+            <StackLayout Style="{StaticResource DetailPageStackLayout}">
+
+                <Frame Style="{StaticResource DetailPageFrame}">
+
+                    <Label Style="{StaticResource LabelFrame}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="56"  Style="{StaticResource FrameSpanValue}"/>
+                                <Span Text="{x:Static x:Environment.NewLine}"/>
+                                <Span Text="CAQI" Style="{StaticResource FrameSpanName}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Frame>
+                <Label  Text="Świetna jakość!" Style="{StaticResource DetailPageTitle}">
+
+                </Label>
+                <Label Text="Możesz bezpiecznie wyjść bez swojej maski anty-smogowej i nie bać sie o swoje zdrowie." Style="{StaticResource DetailPageDescription}">
+
+                </Label>
+                <BoxView Style="{StaticResource HorizontalLine
+                    }"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="25" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <controls:ContentWithHeader Grid.Column="0" Title="PM 2,5">
+                        <controls:ContentWithHeader.ControlContent>
+                            <Label>
+                                <Label.FormattedText>
+
+                                    <FormattedString>
+                                        <Span
+                                        Text="34"
+                                        Style="{StaticResource SpanTextNormal}"/>
+                                        <Span
+                                        Text=" mg/m3 "
+                                        Style="{StaticResource SpanTextSmall}"/>
+                                        <Span
+                                        Text="(137%)"
+                                        Style="{StaticResource SpanTextNormal}"/>
+                                    </FormattedString>
+
+                                </Label.FormattedText>
+                            </Label>
+                        </controls:ContentWithHeader.ControlContent>
+                    </controls:ContentWithHeader>
+             
+                    <BoxView Grid.Column="1" Style="{StaticResource VerticalLine}"/>
+                    <controls:ContentWithHeader  Grid.Column="2" Title="PM 2,5">
+                        <controls:ContentWithHeader.ControlContent>
+                            <Label>
+                                <Label.FormattedText>
+
+                                    <FormattedString>
+                                        <Span
+                                        Text="67"
+                                        Style="{StaticResource SpanTextNormal}"/>
+                                        <Span
+                                        Text=" mg/m3 "
+                                        Style="{StaticResource SpanTextSmall}"/>
+                                        <Span
+                                        Text="(135%)"
+                                        Style="{StaticResource SpanTextNormal}"/>
+                                    </FormattedString>
+
+                                </Label.FormattedText>
+                            </Label>
+                        </controls:ContentWithHeader.ControlContent>
+                    </controls:ContentWithHeader>
+                </Grid>
+
+                <BoxView Style="{StaticResource HorizontalLine}"/>
+                
+                <controls:ContentWithHeader Title="Wilgotność">
+                    <controls:ContentWithHeader.ControlContent>
+                        <StackLayout>
+                            <Label Text="95%" Style="{StaticResource LabelTextNormal}" />
+                            <Slider  Maximum="4" Value="0.95" Style="{StaticResource SliderStyle}"/>
+                        </StackLayout>
+                    </controls:ContentWithHeader.ControlContent>
+                </controls:ContentWithHeader>
+                <BoxView Style="{StaticResource HorizontalLine}"/>
+                <controls:ContentWithHeader Title="Ciśnienie">
+                    <controls:ContentWithHeader.ControlContent>
+                        <StackLayout>
+                            <Label
+                                    Text="1026 hPa"
+                                    Style="{StaticResource LabelTextNormal}" />
+                            <Slider
+                                    Maximum="1100"
+                                    Minimum="900"
+                                    Value="1026"
+                                   Style="{StaticResource SliderStyle}"/>
+                        </StackLayout>
+                    </controls:ContentWithHeader.ControlContent>
+                </controls:ContentWithHeader>
+
+            </StackLayout>
+            <ImageButton
+                Style="{StaticResource ImageButtonHelpedStyle}"
+                Source="baseline_help_outline_black_24.png"
+                Clicked="Help_Clicked"/>
+        </Grid>
+    </ScrollView>
+</ContentPage>

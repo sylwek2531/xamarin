@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <None Remove="baseline_help_outline_black_24.png" />
+    <None Remove="baseline_home_black_24.png" />
+    <None Remove="baseline_settings_black_24.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,11 +23,43 @@
 
   <ItemGroup>
     <Resource Include="baseline_help_outline_black_24.png" />
+    <Resource Include="baseline_home_black_24.png" />
+    <Resource Include="baseline_settings_black_24.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Views\Controls\ContentWithHeader.xaml.cs">
       <DependentUpon>ContentWithHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\DetailsPage.xaml.cs">
+      <DependentUpon>DetailsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\HomePage.xaml.cs">
+      <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MainTabbedPage.xaml.cs">
+      <DependentUpon>MainTabbedPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Styles\Styles.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Styles\Colors.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\HomePage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SettingsPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\MainTabbedPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

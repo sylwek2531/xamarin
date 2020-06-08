@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using WeatherAppMain.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,11 +16,9 @@ namespace WeatherAppMain.Views
         public HomePage()
         {
             InitializeComponent();
+
+            BindingContext = new HomeViewModel(Navigation);
         }
 
-        private void Button_Goto_Detail(object sender, EventArgs e)
-        {
-            Navigation.PushAsync(new DetailsPage());
-        }
     }
 }

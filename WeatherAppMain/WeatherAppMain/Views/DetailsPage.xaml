@@ -2,10 +2,21 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="clr-namespace:WeatherAppMain.Views.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:WeatherAppMain.Views.Controls"
              mc:Ignorable="d"
              x:Class="WeatherAppMain.DetailsPage"
+               xmlns:viewModels="clr-namespace:WeatherAppMain.ViewModels"
+                xmlns:converters="clr-namespace:WeatherAppMain.Converters"
               Style="{StaticResource DetailPageStyle}">
+    <ContentPage.BindingContext>
+        <viewModels:DetailsViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ValueToPercentConverter x:Key="ValueToPercent"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ScrollView>
         <Grid>
             <StackLayout Style="{StaticResource DetailPageStackLayout}">
@@ -15,21 +26,20 @@
                     <Label Style="{StaticResource LabelFrame}">
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="56"  Style="{StaticResource FrameSpanValue}"/>
+                                <Span Text="{Binding CaqiValue}"  Style="{StaticResource FrameSpanValue}"/>
                                 <Span Text="{x:Static x:Environment.NewLine}"/>
                                 <Span Text="CAQI" Style="{StaticResource FrameSpanName}"/>
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
                 </Frame>
-                <Label  Text="Świetna jakość!" Style="{StaticResource DetailPageTitle}">
+                <Label  Text="{Binding Caqititle}" Style="{StaticResource DetailPageTitle}">
 
                 </Label>
-                <Label Text="Możesz bezpiecznie wyjść bez swojej maski anty-smogowej i nie bać sie o swoje zdrowie." Style="{StaticResource DetailPageDescription}">
+                <Label Text="{Binding CaqiDescription}" Style="{StaticResource DetailPageDescription}">
 
                 </Label>
-                <BoxView Style="{StaticResource HorizontalLine
-                    }"/>
+                <BoxView Style="{StaticResource HorizontalLine}"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -43,13 +53,13 @@
 
                                     <FormattedString>
                                         <Span
-                                        Text="34"
+                                        Text="{Binding Pm25Value}"
                                         Style="{StaticResource SpanTextNormal}"/>
                                         <Span
                                         Text=" mg/m3 "
                                         Style="{StaticResource SpanTextSmall}"/>
                                         <Span
-                                        Text="(137%)"
+                                        Text="{Binding Pm25Percent, StringFormat='({0}%)'}"
                                         Style="{StaticResource SpanTextNormal}"/>
                                     </FormattedString>
 
@@ -66,13 +76,13 @@
 
                                     <FormattedString>
                                         <Span
-                                        Text="67"
+                                        Text="{Binding Pm10Value}"
                                         Style="{StaticResource SpanTextNormal}"/>
                                         <Span
                                         Text=" mg/m3 "
                                         Style="{StaticResource SpanTextSmall}"/>
                                         <Span
-                                        Text="(135%)"
+                                        Text="{Binding Pm10Percent, StringFormat='({0}%)'}"
                                         Style="{StaticResource SpanTextNormal}"/>
                                     </FormattedString>
 
@@ -87,8 +97,8 @@
                 <controls:ContentWithHeader Title="Wilgotność">
                     <controls:ContentWithHeader.ControlContent>
                         <StackLayout>
-                            <Label Text="95%" Style="{StaticResource LabelTextNormal}" />
-                            <Slider  Maximum="4" Value="0.95" Style="{StaticResource SliderStyle}"/>
+                            <Label Text="{Binding HumidityValue, Converter={StaticResource ValueToPercent}, StringFormat='{0}%'}" Style="{StaticResource LabelTextNormal}" />
+                            <Slider  Maximum="4" Value="{Binding HumidityValue}" Style="{StaticResource SliderStyle}"/>
                         </StackLayout>
                     </controls:ContentWithHeader.ControlContent>
                 </controls:ContentWithHeader>
@@ -97,12 +107,12 @@
                     <controls:ContentWithHeader.ControlContent>
                         <StackLayout>
                             <Label
-                                    Text="1026 hPa"
+                                    Text="{Binding PressureValue, StringFormat='{0} hPa'}"
                                     Style="{StaticResource LabelTextNormal}" />
                             <Slider
                                     Maximum="1100"
                                     Minimum="900"
-                                    Value="1026"
+                                    Value="{Binding PressureValue}"
                                    Style="{StaticResource SliderStyle}"/>
                         </StackLayout>
                     </controls:ContentWithHeader.ControlContent>

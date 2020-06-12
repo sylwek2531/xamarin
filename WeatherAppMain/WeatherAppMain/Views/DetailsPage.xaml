@@ -14,7 +14,7 @@
     </ContentPage.BindingContext>
     <ContentPage.Resources>
         <ResourceDictionary>
-            <converters:ValueToPercentConverter x:Key="ValueToPercent"/>
+            <converters:PercentToValueConverter x:Key="PercentToValue"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <ScrollView>
@@ -97,8 +97,8 @@
                 <controls:ContentWithHeader Title="Wilgotność">
                     <controls:ContentWithHeader.ControlContent>
                         <StackLayout>
-                            <Label Text="{Binding HumidityValue, Converter={StaticResource ValueToPercent}, StringFormat='{0}%'}" Style="{StaticResource LabelTextNormal}" />
-                            <Slider  Maximum="4" Value="{Binding HumidityValue}" Style="{StaticResource SliderStyle}"/>
+                            <Label Text="{Binding HumidityValue, StringFormat='{0}%'}" Style="{StaticResource LabelTextNormal}" />
+                            <Slider  Value="{Binding HumidityValue, Converter={StaticResource PercentToValue}, Mode=OneWay}" Style="{StaticResource SliderStyle}" />
                         </StackLayout>
                     </controls:ContentWithHeader.ControlContent>
                 </controls:ContentWithHeader>

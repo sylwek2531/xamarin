@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -15,7 +16,7 @@ using Xamarin.Forms;
 
 namespace WeatherAppMain.ViewModels
 {
-    class HomeViewModel
+    public class HomeViewModel : BaseViewModel
     {
         protected readonly INavigation _navigation ; 
         public HomeViewModel(INavigation navigation)
@@ -25,15 +26,29 @@ namespace WeatherAppMain.ViewModels
         }
         private async Task Init()
         {
-            var test = GeneratePath("installations/nearest");
-            Console.WriteLine(test);
-           /* var location = await GetDeviceLocation();
-           
-            var installations = await GetInstalationByLocation(location);
+            Loading = true;
 
-            var measurements = await GetMeasurementsByIdInstallation(installations);
+            var location = await GetDeviceLocation();
 
-            Console.WriteLine(measurements);*/
+             var installations = await GetInstalationByLocation(location);
+
+             var measurements = await GetMeasurementsByIdInstallation(installations);
+
+             ItemsList = new List<Measurement>(measurements);
+
+            Loading = false;
+        }
+        private bool loading;
+        public bool Loading
+        {
+            get => loading;
+            set => SetProperty(ref loading, value);
+        }
+        private List<Measurement> listMeasurements;
+        public List<Measurement> ItemsList
+        {
+            get => listMeasurements;
+            set => SetProperty(ref listMeasurements, value);
         }
 
         private async Task<Location> GetDeviceLocation()
@@ -72,16 +87,24 @@ namespace WeatherAppMain.ViewModels
             }
             return null;
         }
-        private async Task<IEnumerable<Installation>> GetInstalationByLocation(Location location, double maxDistanceKM = 3, int maxResults = 1)
+        private async Task<IEnumerable<Installation>> GetInstalationByLocation(Location location, double maxDistanceKM = 3, int maxResults = -1)
         {
             /*TESTED VALUE*/
-            location.Latitude = 50.017942;
-            location.Longitude = 20.976090;
+          /*  location.Latitude = 50.017942;
+            location.Longitude = 20.976090;*/
             try
             {
 
-                string path = "installations/nearest";
-                var response = await GET<IEnumerable<Installation>>(GetURI(path) + "/?lat=" + location.Latitude + "&lng=" + location.Longitude + "&maxDistanceKM=" + maxDistanceKM + "&maxResults=" + maxResults);
+                string path = App.ApiInstallationUrl;
+                Dictionary<string, object> querry = new Dictionary<string, object>
+                {
+                    {"lat",  location.Latitude},
+                    {"lng", location.Longitude},
+                    {"maxDistanceKM", maxDistanceKM },
+                    {"maxResults", maxResults }
+
+                };
+                var response = await GET<IEnumerable<Installation>>(GeneratePath(path, querry));
 
                 return response;
             }
@@ -94,18 +117,24 @@ namespace WeatherAppMain.ViewModels
         }
         private async Task<IEnumerable<Measurement>> GetMeasurementsByIdInstallation(IEnumerable<Installation> installations)
         {
-            string path = "measurements/installation";
 
-            if(installations.Count() == 0 || installations == null)
+            string path = App.ApiMeasurementUrl;
+            if (installations == null)
             {
                 System.Diagnostics.Debug.WriteLine("No installations.");
                 return null;
             }
+
             var measurements = new List<Measurement>();
 
             foreach (var instalation in installations)
             {
-                var response = await GET<Measurement>(GetURI(path) + "/?installationId=" + instalation.Id);
+                Dictionary<string, object> querry = new Dictionary<string, object>
+                {
+                    { "installationId", instalation.Id }
+                };
+
+                var response = await GET<Measurement>(GeneratePath(path, querry));
                 if (response != null)
                 {
                     response.Installation = instalation;
@@ -117,10 +146,7 @@ namespace WeatherAppMain.ViewModels
             return measurements;
         }
      
-        protected string GetURI(string path)
-        {
-            return "https://airapi.airly.eu/v2/" + path;
-        }
+
         private async Task<T> GET<T>(string URL)
         {
             try
@@ -128,7 +154,7 @@ namespace WeatherAppMain.ViewModels
 
                 HttpClient client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
-                client.DefaultRequestHeaders.Add("apikey", "kKd8vd7FZyrcEfuULfVOfnDaJAJHUEw1");
+                client.DefaultRequestHeaders.Add("apikey", App.ApiKey);
                 client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
                 var response = await client.GetAsync(URL);
 
@@ -158,33 +184,46 @@ namespace WeatherAppMain.ViewModels
             }
             catch (Exception ex)
             {
-
+                System.Diagnostics.Debug.WriteLine($"Error: {ex}");
             }
             return default;
         }
-        private string GeneratePath(string URL)
+        private string GeneratePath(string URL, IDictionary<string, object> queryParams)
         {
             var builder = new UriBuilder
             {
                 Scheme = Uri.UriSchemeHttps,
                 Port = -1,
-                Host = "airapi.airly.eu/v2",
+                Host = App.ApiUrl,
                 Path = URL,
             };
 
-            NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
-            query["action"] = "login1";
-            query["attempts"] = "11";
-            builder.Query = query.ToString();
-//DOKONCZYC TWORZENIE URLA            
+            if(queryParams.Count > 0 && queryParams != null)
+            {
+                NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
+
+                foreach (KeyValuePair<string, object> item in queryParams)
+                {
+                    if (item.Value is double number)
+                    {
+                        query[item.Key] = number.ToString(CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        query[item.Key] = item.Value?.ToString();
+                    }
+                }
+                builder.Query = query.ToString();
+            }
+
             return builder.ToString();
         }
         private ICommand _goToDetailsCommand;
-        public ICommand GoToDetailsCommand => _goToDetailsCommand ?? (_goToDetailsCommand = new Command(OnGoToDetails));
+        public ICommand GoToDetailsCommand => _goToDetailsCommand ?? (_goToDetailsCommand = new Command<Measurement>(OnGoToDetails));
 
-        private void OnGoToDetails()
+        private void OnGoToDetails(Measurement itemElement)
         {
-            _navigation.PushAsync(new DetailsPage());
+            _navigation.PushAsync(new DetailsPage(itemElement));
         }
     }
 }

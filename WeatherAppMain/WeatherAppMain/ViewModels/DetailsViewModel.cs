@@ -1,20 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Text;
+using WeatherAppMain.Models;
 
 namespace WeatherAppMain.ViewModels
 {
-    class DetailsViewModel : INotifyPropertyChanged
+    public class DetailsViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public DetailsViewModel()
         {
 
         }
-       // kKd8vd7FZyrcEfuULfVOfnDaJAJHUEw1 - api klucz
+        private Measurement item;
+        public Measurement Item
+        {
+            get => item;
+            set
+            {
+                SetProperty(ref item, value);
+
+                refreshData();
+            }
+        }
+        private void refreshData()
+        {
+             if (Item?.Current == null) return;
+            var current = Item?.Current;
+            var index = current.Indexes?.FirstOrDefault(c => c.Name == "AIRLY_CAQI");
+            var values = current.Values;
+            var standards = current.Standards;
+
+            CaqiValue = (int)Math.Round(index?.Value ?? 0);
+            Caqititle = index.Description;
+            CaqiDescription = index.Advice;
+            Pm25Value = (int)Math.Round(values?.FirstOrDefault(s => s.Name == "PM25")?.Value ?? 0);
+            Pm10Value = (int)Math.Round(values?.FirstOrDefault(s => s.Name == "PM10")?.Value ?? 0);
+            HumidityValue = (int)Math.Round(values?.FirstOrDefault(s => s.Name == "HUMIDITY")?.Value ?? 0);
+            PressureValue = (int)Math.Round(values?.FirstOrDefault(s => s.Name == "PRESSURE")?.Value ?? 0);
+            Pm25Percent = (int)Math.Round(standards?.FirstOrDefault(s => s.Pollutant == "PM25")?.Percent ?? 0);
+            Pm10Percent = (int)Math.Round(standards?.FirstOrDefault(s => s.Pollutant == "PM10")?.Percent ?? 0);
+      
+        }
         private int caqiValue = 57;
         public int CaqiValue
         {
@@ -75,20 +103,5 @@ namespace WeatherAppMain.ViewModels
             set => SetProperty(ref pressureValue, value);
         }
 
-        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-
-            field = value;
-
-            RaisePropertyChanged(propertyName);
-
-            return true;
-        }
     }
 }

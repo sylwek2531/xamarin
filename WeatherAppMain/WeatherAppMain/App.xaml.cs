@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
+using SQLite;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using WeatherAppMain.Models;
 using WeatherAppMain.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -17,20 +19,21 @@ namespace WeatherAppMain
         public static string ApiUrl { get; private set; }
         public static string ApiMeasurementUrl { get; private set; }
         public static string ApiInstallationUrl { get; private set; }
+        public static SQLiteConnection db {get; private set;}
 
         public App()
         {
             InitializeComponent();
 
             initializeVariables();
-
+             
         }
         private async Task initializeVariables()
         {
             await LoadConfiguration();
+            db = DatabaseHelper.initDb();
 
             MainPage = new MainTabbedPage();
-          /*  MainPage = new NavigationPage(new MainTabbedPage());*/
 
         }
 

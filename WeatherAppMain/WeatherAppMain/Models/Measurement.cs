@@ -11,5 +11,10 @@ namespace WeatherAppMain.Models
         public MeasurementItem[] History { get; set; }
         public MeasurementItem[] Forecast { get; set; }
         public Installation Installation { get; set; }
+
+        public Measurement()
+        {
+
+        }
     }
 }

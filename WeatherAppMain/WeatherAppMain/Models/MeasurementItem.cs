@@ -11,5 +11,10 @@ namespace WeatherAppMain.Models
         public MeasurementValue[] Values { get; set; }
         public AirQualityIndex[] Indexes { get; set; }
         public AirQualityStandard[] Standards { get; set; }
+
+        public MeasurementItem()
+        {
+
+        }
     }
 }

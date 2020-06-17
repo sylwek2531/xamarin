@@ -20,6 +20,7 @@ namespace WeatherAppMain
         public static string ApiMeasurementUrl { get; private set; }
         public static string ApiInstallationUrl { get; private set; }
         public static SQLiteConnection db {get; private set;}
+        public static DatabaseHelper dbHelper { get; private set;}
 
         public App()
         {
@@ -31,7 +32,10 @@ namespace WeatherAppMain
         private async Task initializeVariables()
         {
             await LoadConfiguration();
-            db = DatabaseHelper.initDb();
+
+            dbHelper = new DatabaseHelper();
+
+            db = dbHelper.initDb();
 
             MainPage = new MainTabbedPage();
 
@@ -60,14 +64,35 @@ namespace WeatherAppMain
 
         protected override void OnStart()
         {
+            if(db == null)
+            {
+                dbHelper = new DatabaseHelper();
+
+            }
+            if (dbHelper == null)
+            {
+                db = dbHelper.initDb();
+            }
         }
 
         protected override void OnSleep()
         {
+            dbHelper.Dispose();
+            db = null;
+            dbHelper = null;
         }
 
         protected override void OnResume()
         {
+            if (db == null)
+            {
+                dbHelper = new DatabaseHelper();
+
+            }
+            if (dbHelper == null)
+            {
+                db = dbHelper.initDb();
+            }
         }
     }
 }

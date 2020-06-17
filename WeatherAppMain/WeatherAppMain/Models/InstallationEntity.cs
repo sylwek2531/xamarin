@@ -17,7 +17,15 @@ namespace WeatherAppMain.Models
 
         public InstallationEntity()
         {
+        }
 
+        public InstallationEntity(Installation installation)
+        {
+            this.Id = installation.Id.ToString();
+            this.Location = JsonConvert.SerializeObject(installation.Location);
+            this.Address = JsonConvert.SerializeObject(installation.Address);
+            this.Elevation = installation.Elevation;
+            this.IsAirlyInstallation = installation.IsAirlyInstallation;
         }
     }
 

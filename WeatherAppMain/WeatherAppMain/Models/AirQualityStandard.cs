@@ -8,7 +8,7 @@ namespace WeatherAppMain.Models
     public class AirQualityStandard
     {
         [PrimaryKey, AutoIncrement]
-        public int id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Pollutant { get; set; }
         public double Limit { get; set; }

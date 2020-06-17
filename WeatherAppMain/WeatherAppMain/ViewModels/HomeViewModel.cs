@@ -28,15 +28,28 @@ namespace WeatherAppMain.ViewModels
         {
             Loading = true;
 
-            var location = await GetDeviceLocation();
+            IEnumerable<Installation> installations = null;
+            IEnumerable<Measurement> measurements = null;
+           await Task.Run(async() => { 
+            
+            
+                var location = await GetDeviceLocation();
+                
+                 installations = await GetInstalationByLocation(location);
 
-             var installations = await GetInstalationByLocation(location);
 
-             var measurements = await GetMeasurementsByIdInstallation(installations);
+               DatabaseHelper.saveInstallation(installations.ToList());
 
-             ItemsList = new List<Measurement>(measurements);
+               measurements = await GetMeasurementsByIdInstallation(installations);
+
+               DatabaseHelper.saveMeasurement(measurements.ToList());
+
+           });
 
             Loading = false;
+
+            ItemsList = new List<Measurement>(measurements);
+
         }
         private bool loading;
         public bool Loading
@@ -94,6 +107,12 @@ namespace WeatherAppMain.ViewModels
             location.Longitude = 20.976090;*/
             try
             {
+                if (checkSourceDataFromDb())
+                {
+                    return DatabaseHelper.getInstallation();
+                }
+
+
 
                 string path = App.ApiInstallationUrl;
                 Dictionary<string, object> querry = new Dictionary<string, object>
@@ -104,7 +123,7 @@ namespace WeatherAppMain.ViewModels
                     {"maxResults", maxResults }
 
                 };
-                var response = await GET<IEnumerable<Installation>>(GeneratePath(path, querry));
+                IEnumerable<Installation> response = await GET<IEnumerable<Installation>>(GeneratePath(path, querry));
 
                 return response;
             }
@@ -124,17 +143,21 @@ namespace WeatherAppMain.ViewModels
                 System.Diagnostics.Debug.WriteLine("No installations.");
                 return null;
             }
+            if (checkSourceDataFromDb())
+            {
+                return DatabaseHelper.getMeasurements();
+            }
 
-            var measurements = new List<Measurement>();
+            List<Measurement> measurements = new List<Measurement>();
 
-            foreach (var instalation in installations)
+            foreach (Installation instalation in installations)
             {
                 Dictionary<string, object> querry = new Dictionary<string, object>
                 {
                     { "installationId", instalation.Id }
                 };
 
-                var response = await GET<Measurement>(GeneratePath(path, querry));
+                Measurement response = await GET<Measurement>(GeneratePath(path, querry));
                 if (response != null)
                 {
                     response.Installation = instalation;
@@ -224,6 +247,51 @@ namespace WeatherAppMain.ViewModels
         private void OnGoToDetails(Measurement itemElement)
         {
             _navigation.PushAsync(new DetailsPage(itemElement));
+        }
+        private bool _isRefreshing = false;
+        public bool IsRefreshing
+        {
+            get { return _isRefreshing; }
+            set
+            {
+                SetProperty(ref _isRefreshing, value);
+            }
+        }
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                return new Command(async () =>
+                {
+                    IsRefreshing = true;
+
+                    await Init();
+
+                    IsRefreshing = false;
+                });
+            }
+        }
+
+
+
+        public static bool checkSourceDataFromDb()
+        {
+            List<Measurement> measurements = DatabaseHelper.getMeasurements();
+            DateTime time = DateTime.Now.AddHours(-2);
+
+
+            if (measurements == null || measurements.Count == 0 || measurements.Any(measurement => measurement.Current.TillDateTime < time))
+            {
+                return false;
+              
+
+            }
+            else
+            {
+                return true;
+            }
+
+         
         }
     }
 }

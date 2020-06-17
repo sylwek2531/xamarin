@@ -28,5 +28,6 @@ namespace WeatherAppMain.Views
             viewModel.GoToDetailsCommand.Execute(e.Item as Measurement);
 
         }
+       
     }
 }

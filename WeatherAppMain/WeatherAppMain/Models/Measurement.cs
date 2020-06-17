@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
+
 
 namespace WeatherAppMain.Models
 {
@@ -15,6 +17,14 @@ namespace WeatherAppMain.Models
         public Measurement()
         {
 
+        }
+
+        public Measurement(MeasurementEntity measurementEntity, Installation installation, MeasurementItem measurementItem)
+        {
+            Current = measurementItem;
+            History = JsonConvert.DeserializeObject<MeasurementItem[]>(measurementEntity.History);
+            Forecast = JsonConvert.DeserializeObject<MeasurementItem[]>(measurementEntity.Forecast);
+            Installation = installation;
         }
     }
 }

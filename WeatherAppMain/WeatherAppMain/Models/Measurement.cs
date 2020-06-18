@@ -21,6 +21,7 @@ namespace WeatherAppMain.Models
 
         public Measurement(MeasurementEntity measurementEntity, Installation installation, MeasurementItem measurementItem)
         {
+            CurrentDisplayValue = measurementEntity.CurrentDisplayValue;
             Current = measurementItem;
             History = JsonConvert.DeserializeObject<MeasurementItem[]>(measurementEntity.History);
             Forecast = JsonConvert.DeserializeObject<MeasurementItem[]>(measurementEntity.Forecast);

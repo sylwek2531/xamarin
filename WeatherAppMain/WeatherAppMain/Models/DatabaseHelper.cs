@@ -25,7 +25,7 @@ namespace WeatherAppMain.Models
             string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "airquality.db");
             db = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex);
 
-        /*    db.DeleteAll<InstallationEntity>();
+           /* db.DeleteAll<InstallationEntity>();
             db.DeleteAll<MeasurementEntity>();
             db.DeleteAll<MeasurementItemEntity>();
             db.DeleteAll<MeasurementValue>();
@@ -122,7 +122,7 @@ namespace WeatherAppMain.Models
 
 
                 MeasurementItem measurementItem = new MeasurementItem(measurementItemEntity, measurementValues, measurementIndexes, measurementStandards);
-             //czasem 0 na liscie jest
+
                 Measurement measurement = new Measurement(item, installation, measurementItem);
                 measurements.Add(measurement);
             }

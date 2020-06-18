@@ -18,7 +18,17 @@ namespace WeatherAppMain.ViewModels
 {
     public class HomeViewModel : BaseViewModel
     {
-        protected readonly INavigation _navigation ; 
+        protected readonly INavigation _navigation ;
+        private bool _isRefreshing = false;
+        public bool IsRefreshing
+        {
+            get { return _isRefreshing; }
+            set
+            {
+                SetProperty(ref _isRefreshing, value);
+            }
+        }
+
         public HomeViewModel(INavigation navigation)
         {
             _navigation = navigation;
@@ -32,17 +42,21 @@ namespace WeatherAppMain.ViewModels
             IEnumerable<Measurement> measurements = null;
            await Task.Run(async() => { 
             
-            
                 var location = await GetDeviceLocation();
-                
-                 installations = await GetInstalationByLocation(location);
-
-
-               DatabaseHelper.saveInstallation(installations.ToList());
-
-               measurements = await GetMeasurementsByIdInstallation(installations);
-
-               DatabaseHelper.saveMeasurement(measurements.ToList());
+               //przeniesc bo teraz dw razy odpala sie jeden i ten asam kod zapisu do bazy
+              
+               if (IsRefreshing == true ? false : checkSourceDataFromDb())
+               {
+                   installations = DatabaseHelper.getInstallation();
+                   measurements = DatabaseHelper.getMeasurements();
+               }
+               else
+               {
+                   installations = await GetInstalationByLocation(location);
+                   measurements = await GetMeasurementsByIdInstallation(installations);
+                   DatabaseHelper.saveInstallation(installations.ToList());
+                   DatabaseHelper.saveMeasurement(measurements.ToList());
+               }
 
            });
 
@@ -107,12 +121,6 @@ namespace WeatherAppMain.ViewModels
             location.Longitude = 20.976090;*/
             try
             {
-                if (checkSourceDataFromDb())
-                {
-                    return DatabaseHelper.getInstallation();
-                }
-
-
 
                 string path = App.ApiInstallationUrl;
                 Dictionary<string, object> querry = new Dictionary<string, object>
@@ -143,10 +151,7 @@ namespace WeatherAppMain.ViewModels
                 System.Diagnostics.Debug.WriteLine("No installations.");
                 return null;
             }
-            if (checkSourceDataFromDb())
-            {
-                return DatabaseHelper.getMeasurements();
-            }
+          
 
             List<Measurement> measurements = new List<Measurement>();
 
@@ -248,15 +253,7 @@ namespace WeatherAppMain.ViewModels
         {
             _navigation.PushAsync(new DetailsPage(itemElement));
         }
-        private bool _isRefreshing = false;
-        public bool IsRefreshing
-        {
-            get { return _isRefreshing; }
-            set
-            {
-                SetProperty(ref _isRefreshing, value);
-            }
-        }
+      
         public ICommand RefreshCommand
         {
             get
@@ -277,14 +274,14 @@ namespace WeatherAppMain.ViewModels
         public static bool checkSourceDataFromDb()
         {
             List<Measurement> measurements = DatabaseHelper.getMeasurements();
-            DateTime time = DateTime.Now.AddHours(-2);
+            DateTime time = DateTime.Now;
+            //musze odjac bo dane tillfatetime sa sprzedwoch godzin? ni emusze oddawac wtedy czas jest dobry tak mi sie ywdaje
+            
 
-
-            if (measurements == null || measurements.Count == 0 || measurements.Any(measurement => measurement.Current.TillDateTime < time))
+            if (measurements == null || measurements.Count == 0 || measurements.Any(measurement => (time - measurement.Current.TillDateTime).TotalMinutes >= 60))
             {
                 return false;
               
-
             }
             else
             {

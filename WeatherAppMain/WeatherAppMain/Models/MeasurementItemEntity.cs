@@ -16,14 +16,7 @@ namespace WeatherAppMain.Models
         public string Indexes { get; set; }
         public string Standards { get; set; }
 
-      /*  public MeasurementItemEntity(Measurement measurementEntity)
-        {
-            this.FromDateTime = measurementEntity.Current.FromDateTime;
-            this.TillDateTime = measurementEntity.Current.TillDateTime;
-            this.Values = JsonConvert.SerializeObject(measurementEntity.Current.Values);
-            this.Indexes = JsonConvert.SerializeObject(measurementEntity.Current.Indexes);
-            this.Standards = JsonConvert.SerializeObject(measurementEntity.Current.Standards);
-        }*/
+     
         public MeasurementItemEntity(MeasurementItem measurementEntity)
         {
             this.FromDateTime = measurementEntity.FromDateTime;

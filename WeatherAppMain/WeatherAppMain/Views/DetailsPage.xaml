@@ -112,7 +112,7 @@
                             <Slider
                                     Maximum="1100"
                                     Minimum="900"
-                                    Value="{Binding PressureValue}"
+                                    Value="{Binding PressureValue, Mode=OneWay}"
                                    Style="{StaticResource SliderStyle}"/>
                         </StackLayout>
                     </controls:ContentWithHeader.ControlContent>

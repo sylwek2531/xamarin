@@ -13,16 +13,6 @@ namespace WeatherAppMain.Models
         public AirQualityIndex[] Indexes { get; set; }
         public AirQualityStandard[] Standards { get; set; }
 
-        /* public MeasurementItem(MeasurementItemEntity measurementItemEntity)
-         {
-             this.FromDateTime = measurementItemEntity.FromDateTime;
-             this.TillDateTime = measurementItemEntity.TillDateTime;
-             this.Values = (MeasurementValue[])JsonConvert.DeserializeObject(measurementItemEntity.Values);
-             this.Indexes = (AirQualityIndex[])JsonConvert.DeserializeObject(measurementItemEntity.Indexes);
-             this.Standards = (AirQualityStandard[])JsonConvert.DeserializeObject(measurementItemEntity.Standards);
-             *//*            this.Address = (Address)JsonConvert.DeserializeObject(installationEntity.Address)
-             *//*
-         }*/
         public MeasurementItem()
         {
 
@@ -35,7 +25,6 @@ namespace WeatherAppMain.Models
             this.Values = measurementItem.Values;
             this.Indexes = measurementItem.Indexes;
             this.Standards = measurementItem.Standards;
-            //??
           
         }
 

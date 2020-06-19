@@ -13,6 +13,7 @@ using System.Windows.Input;
 using WeatherAppMain.Models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Xamarin.Forms.Maps;
 
 namespace WeatherAppMain.ViewModels
 {
@@ -20,6 +21,19 @@ namespace WeatherAppMain.ViewModels
     {
         protected readonly INavigation _navigation ;
         private bool _isRefreshing = false;
+
+        private Location _actaulLocation;
+        public Location location
+        {
+            get => _actaulLocation;
+            set => SetProperty(ref _actaulLocation, value);
+        }
+        private IEnumerable<MapLocation> _locations;
+        public IEnumerable<MapLocation> Locations
+        {
+            get => _locations;
+            set => SetProperty(ref _locations, value);
+        }
         public bool IsRefreshing
         {
             get { return _isRefreshing; }
@@ -40,30 +54,30 @@ namespace WeatherAppMain.ViewModels
 
             IEnumerable<Installation> installations = null;
             IEnumerable<Measurement> measurements = null;
-           await Task.Run(async() => { 
-            
-                var location = await GetDeviceLocation();
-               //przeniesc bo teraz dw razy odpala sie jeden i ten asam kod zapisu do bazy
-              
-               if (IsRefreshing == true ? false : checkSourceDataFromDb())
-               {
-                   installations = DatabaseHelper.getInstallation();
-                   measurements = DatabaseHelper.getMeasurements();
-               }
-               else
-               {
-                   installations = await GetInstalationByLocation(location);
-                   measurements = await GetMeasurementsByIdInstallation(installations);
-                   DatabaseHelper.saveInstallation(installations.ToList());
-                   DatabaseHelper.saveMeasurement(measurements.ToList());
-               }
+            await Task.Run(async() => {
 
-           });
+                location = await GetDeviceLocation();
+                //przeniesc bo teraz dw razy odpala sie jeden i ten asam kod zapisu do bazy
+               
+                //czy view model musi sie odpalac dwa razy na ytaby??
+                if (IsRefreshing == true ? false : checkSourceDataFromDb())
+                {
+                    installations = DatabaseHelper.getInstallation();
+                    measurements = DatabaseHelper.getMeasurements();
+                }
+                else
+                {
+                    installations = await GetInstalationByLocation(location);
+                    measurements = await GetMeasurementsByIdInstallation(installations);
+                    DatabaseHelper.saveInstallation(installations.ToList());
+                    DatabaseHelper.saveMeasurement(measurements.ToList());
+                }
+            });
 
             Loading = false;
 
             ItemsList = new List<Measurement>(measurements);
-
+            Locations = ItemsList.Select(i => new MapLocation { Address = i.Installation.Address.Description, Description = "CAQI: " + i.CurrentDisplayValue, Position = new Position(i.Installation.Location.Latitude, i.Installation.Location.Longitude) }).ToList();
         }
         private bool loading;
         public bool Loading
@@ -78,7 +92,7 @@ namespace WeatherAppMain.ViewModels
             set => SetProperty(ref listMeasurements, value);
         }
 
-        private async Task<Location> GetDeviceLocation()
+        public async Task<Location> GetDeviceLocation()
         {
             try
             {
@@ -268,9 +282,15 @@ namespace WeatherAppMain.ViewModels
                 });
             }
         }
+        private ICommand _infoWindowClickedCommand;
 
+        public ICommand InfoWindowClickedCommand => _infoWindowClickedCommand ?? (_infoWindowClickedCommand = new Command<string>(PinClicked));
+        private void PinClicked(string address)
+        {
+            Measurement item = ItemsList.First<Measurement>(i => i.Installation.Address.Description.Equals(address));
+            OnGoToDetails(item);
 
-
+        }
         public static bool checkSourceDataFromDb()
         {
             List<Measurement> measurements = DatabaseHelper.getMeasurements();
